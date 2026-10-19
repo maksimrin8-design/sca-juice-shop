@@ -20,7 +20,7 @@ jobs:
           format: cyclonedx-json
           output-file: sbom.json
 
-      # --- SCA (Trivy) - Сканируем всё ---
+      # --- SCA (Trivy) ---
       - name: Run Trivy (Independent)
         uses: aquasecurity/trivy-action@master
         with:
@@ -31,10 +31,8 @@ jobs:
           severity: 'CRITICAL,HIGH,MEDIUM'
           exit-code: '0'
 
-      # --- SCA (Grype) - Выводим ВСЁ в консоль ---
+      # --- SCA (Grype) ---
       - name: Run Grype (Independent)
         run: |
-          echo "Устанавливаем Grype..."
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
-          echo "Запускаем сканирование..."
           grype dir:. -o table --fail-on never || true
