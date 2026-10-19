@@ -35,4 +35,5 @@ jobs:
       - name: Run Grype (Independent)
         run: |
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
-          grype dir:. -o table --fail-on never || true
+          grype dir:. -o table || true
+
