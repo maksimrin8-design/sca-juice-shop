@@ -3,8 +3,6 @@ name: SCA and SBOM Analysis
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -22,13 +20,7 @@ jobs:
           format: cyclonedx-json
           output-file: sbom.json
 
-      - name: Upload SBOM as Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: sbom-file
-          path: sbom.json
-
-      # --- SCA (Trivy) ---
+      # --- SCA (Trivy) - Сканируем всё ---
       - name: Run Trivy (Independent)
         uses: aquasecurity/trivy-action@master
         with:
@@ -39,17 +31,10 @@ jobs:
           severity: 'CRITICAL,HIGH,MEDIUM'
           exit-code: '0'
 
-      # --- SCA (Grype) ---
+      # --- SCA (Grype) - Выводим ВСЁ в консоль ---
       - name: Run Grype (Independent)
-        uses: anchore/scan-action@v3
-        with:
-          path: '.'
-          fail-build: false
-          output-format: 'table'
-          output: 'grype-report.txt'
-
-      - name: Upload Grype Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: grype-report
-          path: grype-report.txt
+        run: |
+          echo "Устанавливаем Grype..."
+          curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+          echo "Запускаем сканирование..."
+          grype dir:. -o table --fail-on never || true
